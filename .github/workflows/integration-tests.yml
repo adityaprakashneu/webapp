@@ -3,22 +3,45 @@ name: Integration Tests
 on: [push]
 
 jobs:
-  test:
+  integration_tests:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: 'Cloud@2023'
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
 
-      - name: Install dependencies
-        run: |
-          pip install -r required_libraries.txt
+    - name: Install dependencies
+      run: pip install -r required_libraries.txt
 
-      - name: Run integration tests
-        run: |
-          python run_integration_tests.py
+    - name: Configure application
+      run: |
+        export MYSQL_HOST=mysql
+        export MYSQL_PORT=3306
+        export MYSQL_USER=csye6225
+        export MYSQL_PASSWORD='Cloud@2023'
+
+    - name: Wait for MySQL to be healthy
+      run: |
+        dockerize -wait tcp://mysql:3306 -timeout 1m
+
+    - name: Run integration tests
+      run: |
+        pytest main.py
+
+    - name: Clean up
+      run: |
+        docker-compose down

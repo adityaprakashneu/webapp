@@ -32,20 +32,18 @@ jobs:
 
     - name: Configure application
       run: |
-        export MYSQL_HOST=mysql
+        export MYSQL_HOST=localhost
         export MYSQL_PORT=3306
         export MYSQL_USER=csye6225
         export MYSQL_PASSWORD='Cloud@2023'
 
-    - name: Install dockerize
-      run: |
-        wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz
-        tar -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
-        sudo mv dockerize /usr/local/bin/
-        rm dockerize-linux-amd64-v0.6.1.tar.gz
-
     - name: Wait for MySQL to be healthy
-      run: dockerize -wait tcp://172.17.0.1:3306 -timeout 1m
+      run: |
+         echo "Waiting for MySQL to be healthy..."
+         while ! mysqladmin ping -h localhost --silent; do
+           sleep 1
+         done
+         echo "MySQL is healthy."
 
     - name: Run integration tests
       run: |

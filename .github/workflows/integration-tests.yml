@@ -3,52 +3,42 @@ name: Integration Tests
 on: [push]
 
 jobs:
-  integration_tests:
+  test:
     runs-on: ubuntu-latest
 
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:latest
         env:
-          MYSQL_ROOT_PASSWORD: 'Cloud@2023'
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db
         ports:
-          - 3306/tcp
+          - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-    - name: Upgrade pip
-      run: pip install --upgrade pip
+      - name: Install dependencies
+        run: pip install -r required_libraries.txt
 
-    - name: Install dependencies
-      run: pip install -r required_libraries.txt
+      - name: Wait for MySQL to be healthy
+        run: |
+          echo "Waiting for MySQL to be healthy..."
+          while ! mysqladmin ping -h 127.0.0.1 --silent; do
+            sleep 1
+          done
+          echo "MySQL is healthy."
 
-    - name: Configure application
-      run: |
-        export MYSQL_HOST=localhost
-        export MYSQL_PORT=3306
-        export MYSQL_USER=csye6225
-        export MYSQL_PASSWORD='Cloud@2023'
+      - name: Start Flask app
+        run: python app.py &
 
-    - name: Wait for MySQL to be healthy
-      run: |
-         echo "Waiting for MySQL to be healthy..."
-         while ! mysqladmin ping -h localhost --silent; do
-           sleep 1
-         done
-         echo "MySQL is healthy."
-
-    - name: Run integration tests
-      run: |
-        pytest main.py
-
-    - name: Clean up
-      run: |
-        docker-compose down
+      - name: Run integration tests
+        run: |
+          pytest integration_tests.py

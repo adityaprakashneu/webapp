@@ -41,4 +41,4 @@ jobs:
 
       - name: Run integration tests
         run: |
-          pytest integration_tests.py
+          python integration_tests.py

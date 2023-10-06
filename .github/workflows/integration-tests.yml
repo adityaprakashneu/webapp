@@ -24,9 +24,11 @@ jobs:
       with:
         python-version: '3.8'
 
-    - name: Install dependencies
+    - name: Upgrade pip
       run: pip install --upgrade pip
-        pip install -r required_libraries.txt
+
+    - name: Install dependencies
+      run: pip install -r required_libraries.txt
 
     - name: Configure application
       run: |

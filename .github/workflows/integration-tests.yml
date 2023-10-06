@@ -3,22 +3,40 @@ name: Integration Tests
 on: [push]
 
 jobs:
-  test:
+  integration_tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
 
-      - name: Install dependencies
-        run: |
-          pip install -r required_libraries.txt
+    - name: Install dependencies
+      run: pip install -r required_libraries.txt
 
-      - name: Run integration tests
-        run: |
-          python integration_tests.py
+    - name: Set up MySQL
+      uses: mysqljs/mysql@v2
+      with:
+        mysql-version: '8.0'
+        mysql-port: 3306
+        mysql-root-password: 'Cloud@2023'
+
+    - name: Configure application
+      run: |
+        export MYSQL_HOST=127.0.0.1
+        export MYSQL_PORT=3306
+        export MYSQL_USER=csye6225
+        export MYSQL_PASSWORD='Cloud@2023'
+        # Configure your application with the MySQL connection details
+
+    - name: Run integration tests
+      run: |
+        pytest main.py
+
+    - name: Clean up MySQL
+      run: |
+        mysqladmin -u csye6225 -p 'Cloud@2023' shutdown

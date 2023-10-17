@@ -14,7 +14,7 @@ import pymysql
 def test_mysql_connection():
     try:
         connection = pymysql.connect(
-            host="mysql",  # Use the service name defined in the workflow
+            host="127.0.0.1",  # Use the service name defined in the workflow
             user="root",
             password="rootpassword",  # Set the same root password as in the workflow
             database="test_db"  # Use the same database name as in the workflow

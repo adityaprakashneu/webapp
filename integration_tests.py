@@ -9,21 +9,22 @@
 #     assert response_post.status_code == 405
 #     assert response_not_found.status_code == 404
 
-import pymysql
+import mysql.connector
 
 def test_mysql_connection():
     try:
-        connection = pymysql.connect(
+        connection = mysql.connector.connect(
             host="127.0.0.1",
             user="root",
             password="rootpassword",
             database="test_db",
-            auth_plugin='mysql_native_password'
+            auth_plugin='mysql_native_password' 
         )
         connection.close()
         assert True
-    except pymysql.MySQLError as e:
+    except mysql.connector.Error as e:
         assert False, f"MySQL Error: {e}"
 
 if __name__ == '__main__':
     test_mysql_connection()
+

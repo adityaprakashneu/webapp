@@ -14,10 +14,11 @@ import pymysql
 def test_mysql_connection():
     try:
         connection = pymysql.connect(
-            host="127.0.0.1",  # Use the service name defined in the workflow
+            host="127.0.0.1",
             user="root",
-            password="rootpassword",  # Set the same root password as in the workflow
-            database="test_db"  # Use the same database name as in the workflow
+            password="rootpassword",
+            database="test_db",
+            auth_plugin='mysql_native_password'
         )
         connection.close()
         assert True

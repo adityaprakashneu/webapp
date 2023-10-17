@@ -36,8 +36,8 @@ jobs:
           done
           echo "MySQL is healthy."
 
-      - name: Start Flask app
-        run: python main.py &
+      # - name: Start Flask app
+      #   run: python main.py &
 
       - name: Run integration tests
         run: |
